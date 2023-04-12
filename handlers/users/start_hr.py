@@ -8,8 +8,16 @@ from loader import bot, dp, db
 from utils.misc import subscription
 from keyboards.default.start_dk import main_keyboard
 
+
 @dp.message_handler(commands=['start'], state="*")
 async def show_channels(msg: types.Message, state: FSMContext):
+
+    channels_format = str()
+    for channel in CHANNELS:
+        chat = await bot.get_chat(channel)
+        invite_link = await chat.export_invite_link()
+        #logging info (invite_link)
+        channels_format += f"👉 <a href='{invite_link}'>{chat.title}</a>\n"
     try:
         await db.add_user(
             telegram_id=msg.from_user.id,
@@ -19,12 +27,6 @@ async def show_channels(msg: types.Message, state: FSMContext):
     except asyncpg.exceptions.UniqueViolationError:
         await db.select_user(telegram_id=msg.from_user.id)
 
-    # channels_format = str()
-    # for channel in CHANNELS:
-    #     chat = await bot.get_chat(channel)
-    #     invite_link = await chat.export_invite_link()
-    #     #logging info (invite_link)
-    #     channels_format += f"👉 <a href='{invite_link}'>{chat.title}</a>\n"
 
     await msg.answer(f"Ассалому алайкум!\nБу бот орқали Сиз Ҳасанхон Яҳё Абдулмажид қори дарсликларини аудио ва видео шаклда кўришингиз ва "
                          f"эшитишингиз мумкин.",
