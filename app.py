@@ -8,6 +8,8 @@ from handlers.users.help import AlbumMiddleware
 
 async def on_startup(dispatcher):
     await set_default_commands(dispatcher)
+    await db.create()
+    await db.create_table_users()
     await on_startup_notify(dispatcher)
 
 
