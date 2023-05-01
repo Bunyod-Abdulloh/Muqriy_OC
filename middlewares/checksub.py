@@ -7,6 +7,7 @@ from data.config import CHANNELS
 from utils.misc import subscription
 from loader import bot
 
+
 class BigBrother(BaseMiddleware):
     async def on_pre_process_update(self, update: types.Update, data: dict):
         if update.message:
@@ -27,6 +28,7 @@ class BigBrother(BaseMiddleware):
                                               channel=channel)
             final_status *= status
             channel = await bot.get_chat(channel)
+
             if not status:
                 invite_link = await channel.export_invite_link()
                 result += (f"👉 <a href='{invite_link}'>{channel.title}</a>\n")

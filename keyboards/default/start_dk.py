@@ -52,12 +52,11 @@ main_keyboard = ReplyKeyboardMarkup(
             KeyboardButton("📑 Навоийни англаш сари"),
         ],
         [
-            KeyboardButton("📿 Тонгги ва кечки зикрлар"),
-            KeyboardButton("✅ Савол ва таклифлар"),
+            KeyboardButton("📿 Тонгги ва кечки зикрлар")
         ],
     ],
     resize_keyboard=True,
     one_time_keyboard=True
 )
 
-# KeyboardButton("ℹ Қўлланма"),
+# KeyboardButton("ℹ Қўлланма"), KeyboardButton("✅ Савол ва таклифлар"),

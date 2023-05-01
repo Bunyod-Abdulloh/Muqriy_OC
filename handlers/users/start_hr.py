@@ -1,6 +1,6 @@
 import asyncpg
 from aiogram.dispatcher import FSMContext
-from aiogram import types
+from aiogram.types import CallbackQuery, ChatMemberUpdated, Message, ReplyKeyboardRemove
 
 from data.config import CHANNELS
 from keyboards.inline.qversein import check_button
@@ -10,34 +10,61 @@ from keyboards.default.start_dk import main_keyboard
 
 
 @dp.message_handler(commands=['start'], state="*")
-async def show_channels(msg: types.Message, state: FSMContext):
-
+async def show_channels(msg: Message, state: FSMContext):
     channels_format = str()
     for channel in CHANNELS:
         chat = await bot.get_chat(channel)
         invite_link = await chat.export_invite_link()
-        #logging info (invite_link)
         channels_format += f"👉 <a href='{invite_link}'>{chat.title}</a>\n"
-    try:
-        await db.add_user(
-            telegram_id=msg.from_user.id,
-            full_name=msg.from_user.full_name,
-            username=msg.from_user.username,
-        )
-    except asyncpg.exceptions.UniqueViolationError:
-        await db.select_user(telegram_id=msg.from_user.id)
-
-
-    await msg.answer(f"Ассалому алайкум!\nБу бот орқали Сиз Ҳасанхон Яҳё Абдулмажид қори дарсликларини аудио ва видео шаклда кўришингиз ва "
-                         f"эшитишингиз мумкин.",
-                         reply_markup=main_keyboard)
+    await msg.answer("Ассалому алайкум!\nБу бот орқали Сиз Ҳасанхон Яҳё Абдулмажид қори дарсликларини аудио ва видео "
+                     "шаклда кўришингиз ва эшитишингиз мумкин.", reply_markup=ReplyKeyboardRemove())
+    await msg.answer(f"Ботни ишлатиш учун қуйидаги каналимизга обуна бўлинг:\n"
+                     f"{channels_format}", reply_markup=check_button, disable_web_page_preview=True)
     await state.finish()
 
-# @dp.callback_query_handler(text='check_subs') async def checker(call: types.CallbackQuery): await call.answer()
-# result = str() for channel in CHANNELS: status = await subscription.check(user_id=call.from_user.id,
-# channel=channel) channel = await bot.get_chat(channel) if status: result += f"✅ Сиз, <b>{channel.title}</b>
-# каналимизга обуна бўлгансиз!\n\nБотимиздан фойдаланишингиз мумкин!" await call.message.answer(result,
-# reply_markup=main_keyboard) try: await db.add_user( id=call.from_user.id, full_name=call.from_user.full_name,
-# poralar="{}", ) except asyncpg.exceptions.UniqueViolationError: pass else: invite_link = await
-# channel.export_invite_link() result += (f"❌ Сиз, <b>{channel.title}</b> каналимизга обуна бўлмагансиз! " f"<a
-# href='{invite_link}'> Обуна бўлиш!</a>\n\n") await call.message.answer(result, disable_web_page_preview=True)
+
+@dp.chat_member_handler(state='*')
+async def members(msg: ChatMemberUpdated):
+    user_id = msg.new_chat_member.user.id
+    try:
+        if msg.new_chat_member.status == 'member':
+            await bot.send_message(chat_id=user_id,
+                                   text='Сиз каналимизга аъзо бўлдингиз! Ботимиздан фойдаланишингиз мумкин!',
+                                   reply_markup=main_keyboard)
+            try:
+                await db.add_user(telegram_id=msg.from_user.id)
+            except asyncpg.exceptions.UniqueViolationError:
+                pass
+
+        elif msg.new_chat_member.status == 'left':
+            channels_format = str()
+            for channel in CHANNELS:
+                chat = await bot.get_chat(channel)
+                invite_link = await chat.export_invite_link()
+                channels_format += f" 👉 <a href='{invite_link}'>{chat.title}</a>\n"
+
+            await bot.send_message(chat_id=user_id,
+                                   text=f'Сиз, {channels_format}каналимиздан чиқиб кетдингиз!'
+                                        '\nБотимиздан фойдаланиш имконияти чекланди!',
+                                   reply_markup=ReplyKeyboardRemove())
+            await db.delete_user_tgid(msg.from_user.id)
+    except Exception:
+        pass
+
+
+@dp.callback_query_handler(text="check_subs")
+async def checker(call: CallbackQuery):
+    await call.answer()
+    result = str()
+    for channel in CHANNELS:
+        status = await subscription.check(user_id=call.from_user.id,
+                                          channel=channel)
+        channel = await bot.get_chat(channel)
+        if status:
+            result += f"<b>{channel.title}</b> каналимизга обуна бўлгансиз!\n\n"
+            await call.message.answer(result, reply_markup=main_keyboard, disable_web_page_preview=True)
+        else:
+            invite_link = await channel.export_invite_link()
+            result += (f"Сиз, 👉 <a href='{invite_link}'>{channel.title}</a>\nканалига обуна бўлмагансиз"
+                       f"\n<a href='{invite_link}'>Обуна бўлиш</a>")
+            await call.message.answer(result, disable_web_page_preview=True)

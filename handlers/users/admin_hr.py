@@ -16,13 +16,9 @@ from loader import dp, bot, db
 @dp.message_handler(text="🏡 Бош меню", state="*")
 async def boshmenyu_func(msg: types.Message, state: FSMContext):
     try:
-        await db.add_user(
-            telegram_id=msg.from_user.id,
-            full_name=msg.from_user.full_name,
-            username=msg.from_user.username,
-        )
+        await db.add_user(telegram_id=msg.from_user.id)
     except asyncpg.exceptions.UniqueViolationError:
-        await db.select_user(telegram_id=msg.from_user.id)
+        pass
     await msg.answer("Бош меню", reply_markup=main_keyboard)
     await state.finish()
 
@@ -36,24 +32,27 @@ async def buttons(msg: types.Message, state: FSMContext):
 
 @dp.message_handler(state="admbuttons", user_id=BOT_ADMINS)
 async def bot_start(msg: types.Message, state: FSMContext):
+
+    habar = "\nAvvalgi habarga javob olingan yo'qligini tekshirib ko'ring!"
+
     if msg.text == "users":
         count = await db.count_users()
         await msg.answer(f"\nБазада {count} та фойдаланувчи мавжуд.")
 
     elif msg.text == "Forward ON":
-        await msg.answer("<b>FORWARD STATE</b> ЁҚИЛДИ!")
+        await msg.answer(f"<b>FORWARD STATE</b> yoqildi!{habar}")
         await state.set_state("forw")
 
     elif msg.text == "MediaGroup ON":
-        await msg.answer("<b>MEDIA GROUP STATE</b> ЁҚИЛДИ!")
+        await msg.answer(f"<b>MEDIA GROUP STATE</b> yoqildi!{habar}")
         await state.set_state("mediagroup")
 
     elif msg.text == "ID ON":
-        await msg.answer("<b>ID OLISH STATE</b> ЁҚИЛДИ!")
+        await msg.answer(f"<b>ID OLISH STATE</b> yoqildi!{habar}")
         await state.set_state("idolish")
 
     elif msg.text == "Sending messages":
-        await msg.answer("<b>E'LON JO'NATISH STATE</b> ЁҚИЛДИ!")
+        await msg.answer(f"<b>E'LON JO'NATISH STATE</b> yoqildi!{habar}")
         await state.set_state("elon")
 
 
@@ -73,35 +72,36 @@ async def contumum(msg: types.Message, state: FSMContext):
 
             users = await db.select_all_users()
             count_baza = await db.count_users()
-            count_err = 0
-            count = 0
-            all_req = 0
+            active = 0
+            block = 0
+            counter = 0
+
             for user in users:
-                user_id = user[3]
+                user_id = user[1]
                 try:
                     await msg.forward(chat_id=user_id)
 
-                    count += 1
+                    active += 1
 
                 except Exception:
 
-                    count_err += 1
+                    block += 1
                     continue
-                await asyncio.sleep(0.5)
 
-                all_req += 1
+                counter += 1
 
-                if all_req == 1990:
-                    await asyncio.sleep(10)
+                if counter == 25:
+                    counter = 0
+                    await asyncio.sleep(0.5)
+            await state.finish()
 
-            await msg.answer(f"Хабар юборилганлар: <b>{count}</b> та."
-                             f"\n\nЮборилмаганлар: <b>{count_err}</b> та."
-                             f"\n\nБазада жами: <b>{count_baza}</b> та"
-                             f" фойдаланувчи мавжуд")
+            await msg.answer(f"SENT: <b>{active}</b>"
+                             f"\nBLOCK: <b>{block}</b>"
+                             f"\nALL_USERS: <b>{count_baza}</b>")
 
-    count_err = 0
-    count = 0
-    all_req = 0
+    active = 0
+    block = 0
+    counter = 0
 
 
 @dp.message_handler(is_media_group=True, content_types=types.ContentType.ANY, state="mediagroup")
@@ -119,37 +119,39 @@ async def mediagr(msg: types.Message, album: List[types.Message], state: FSMCont
         except Exception as err:
             logging.exception(err)
             return await msg.answer("Бу альбомни aiogram қўлламайди!")
-    await state.finish()
 
     users = await db.select_all_users()
     count_baza = await db.count_users()
-    count_err = 0
-    count = 0
-    all_req = 0
+    active = 0
+    block = 0
+    counter = 0
+    await msg.answer(f"<i>Хабар юборилганлиги ҳақидаги тўлиқ маълумот тез орада юборилади</i>",
+                     reply_markup=main_keyboard)
     for user in users:
-        user_id = user[3]
+        user_id = user[1]
         try:
             await bot.send_media_group(chat_id=user_id,
                                        media=media_group
                                        )
-            count += 1
+            active += 1
 
         except Exception:
-            count_err += 1
+            block += 1
             continue
-        await asyncio.sleep(0.5)
 
-        if all_req == 1990:
-            await asyncio.sleep(10)
+        counter += 1
 
-    await msg.answer(f"Хабар юборилганлар: <b>{count}</b> та."
-                     f"\n\nЮборилмаганлар: <b>{count_err}</b> та."
-                     f"\n\nБазада жами: <b>{count_baza}</b> та"
-                     f" фойдаланувчи мавжуд.")
+        if counter == 25:
+            counter = 0
+            await asyncio.sleep(0.5)
+    await state.finish()
+    await msg.answer(f"SENT: <b>{active}</b>"
+                     f"\nBLOCK: <b>{block}</b>"
+                     f"\nALL_USERS: <b>{count_baza}</b>")
 
-    count_err = 0
-    count = 0
-    all_req = 0
+    active = 0
+    block = 0
+    counter = 0
 
 
 @dp.message_handler(state="mediagroup")
@@ -194,11 +196,11 @@ async def elonj(msg: types.Message, state: FSMContext):
         await state.set_state("admbuttons")
 
     elif msg.text:
-        habar = msg.text
+        matn = msg.text
         await msg.answer("<b><i>Юборадиган хабарингизни текширдингизми?"
                          "\n\n<b>ОГОҲ БЎЛИНГ ХАБАРИНГИЗ КЎПЧИЛИККА БОРАДИ!!!</b>"
                          "\n\nХабарни юборасизми?</i></b>", reply_markup=yes_no)
-        await state.update_data(text=habar)
+        await state.update_data(text=matn)
         await state.set_state("yes_no")
 
 
@@ -207,41 +209,40 @@ async def checkyes_no(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     users = await db.select_all_users()
     count_baza = await db.count_users()
-    count_err = 0
-    count = 0
-    all_req = 0
+    active = 0
+    block = 0
+    counter = 0
     if call.data == "yes":
         await call.message.answer(f"<i>Хабар юборилганлиги ҳақидаги тўлиқ маълумот тез орада юборилади</i>",
                                   reply_markup=main_keyboard)
         await state.finish()
 
         for user in users:
-            user_id = user[3]
+            user_id = user[1]
             try:
                 await bot.send_message(chat_id=user_id,
                                        text=data['text']
                                        )
-                count += 1
+                active += 1
 
             except Exception:
-                count_err += 1
+                block += 1
                 continue
-            await asyncio.sleep(0.5)
 
-            all_req += 1
+            counter += 1
 
-            if all_req == 1990:
-                await asyncio.sleep(10)
+            if counter == 25:
+                counter = 0
+                await asyncio.sleep(0.5)
 
-        await call.message.answer(f"Хабар юборилганлар: <b>{count}</b> та."
-                                  f"\n\nЮборилмаганлар: <b>{count_err}</b> та."
-                                  f"\n\nБазада жами: <b>{count_baza}</b> та"
-                                  f" фойдаланувчи мавжуд")
+        await call.message.answer(f"SENT: <b>{active}</b>"
+                                  f"\nBLOCK: <b>{block}</b>"
+                                  f"\nALL_USERS: <b>{count_baza}</b>")
 
     elif call.data == "no_again":
         await call.message.answer("Хабарингизни қайта юборишингиз мумкин!")
         await state.set_state("elon")
 
-    count_err = 0
-    count_baza = 0
-    all_req = 0
+    active = 0
+    block = 0
+    counter = 0

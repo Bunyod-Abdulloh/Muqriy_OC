@@ -7,6 +7,7 @@ class AdminFilter(BoundFilter):
         member = await message.chat.get_member(message.from_user.id)
         return member.is_chat_admin()
 
+
 class TextReply(BoundFilter):
     key = "text_reply"
 
@@ -14,6 +15,7 @@ class TextReply(BoundFilter):
         message = message.reply_to_message
         if message.content_type == 'text':
             return True
+
 
 class PhotoReply(BoundFilter):
     key = "photo_reply"
@@ -23,6 +25,7 @@ class PhotoReply(BoundFilter):
         if message.content_type == 'photo':
             return True
 
+
 class VoiceReply(BoundFilter):
     key = "voice_reply"
 
@@ -31,6 +34,7 @@ class VoiceReply(BoundFilter):
         if message.content_type == 'voice':
             return True
 
+
 class VideoReply(BoundFilter):
     key = "video_reply"
 
@@ -38,6 +42,7 @@ class VideoReply(BoundFilter):
         message = message.reply_to_message
         if message.content_type == 'video':
             return True
+
 
 class AudioReply(BoundFilter):
     key = "audio_reply"

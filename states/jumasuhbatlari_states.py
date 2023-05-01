@@ -1,5 +1,6 @@
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
+
 class JumaSuhbatlari(StatesGroup):
     juma_one = State()
     juma_audio_one = State()
