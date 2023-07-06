@@ -28,6 +28,3 @@ alldk = ReplyKeyboardMarkup(
     resize_keyboard=True,
     one_time_keyboard=True
 )
-
-# else:
-#     await msg.answer("Қуйидаги тугмалардан бирини киритинг:")

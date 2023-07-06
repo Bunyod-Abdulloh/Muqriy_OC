@@ -68,3 +68,17 @@ async def checker(call: CallbackQuery):
             result += (f"Сиз, 👉 <a href='{invite_link}'>{channel.title}</a>\nканалига обуна бўлмагансиз"
                        f"\n<a href='{invite_link}'>Обуна бўлиш</a>")
             await call.message.answer(result, disable_web_page_preview=True)
+
+
+@dp.message_handler(text='adminid', state='*')
+async def idolish_admin(msg: Message, state: FSMContext):
+    await msg.answer("ID OLISH YOQILDI! VIDEO YOKI RASMLARNI JO'NATISHINGIZ MUMKIN!")
+    await state.set_state('admin_id')
+
+
+@dp.message_handler(state='admin_id', content_types=['any'])
+async def stateadminid(msg: Message):
+    if msg.content_type == 'photo':
+        await msg.answer(f"PHOTO_ID\n\n<code>{msg.photo[-1].file_id}</code>")
+    elif msg.content_type == 'video':
+        await msg.answer(f"VIDEO_ID\n\n<code>{msg.video.file_id}</code>")

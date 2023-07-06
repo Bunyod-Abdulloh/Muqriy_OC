@@ -1,9 +1,8 @@
 from aiogram import types
-from aiogram.dispatcher.filters import Command, Text
 from aiogram.dispatcher import FSMContext
 
 from loader import dp
-from keyboards.default.qurantanishuv_dk import tanishuv_aud_vid_keys, tanishuv_keys, tanishuv_aud_keys
+from keyboards.default.quran_talimi import tanishuv_aud_vid_keys, tanishuv_keys, tanishuv_aud_keys
 
 # VIDEO HANDLER
 
@@ -394,7 +393,7 @@ async def tanishuv_audio(msg: types.Message):
         caption="🟢 РАҲМОН СУРAСИ 1-ОЯТДАН  САФ СУРAСИ 14-ОЯТГАЧА | "
                 "Қуръон билан танишув \n23-СУҲБАТ")
     await msg.answer_audio(
-        audio="CQACAgIAAxkBAAIMdmJDgc4Ee9j9Vo0_RmEQEkkRszOfAAIwGwAChrqJSHwUCMbsUShOIwQ",
+        audio="CQACAgIAAxkBAAEcvrNkmZFH0GAu8vKnWsOvaAk2H8acvAACIDUAAptIyUg2lUZbPbU0eS8E",
         caption="🟢 ЖУМА СУРAСИ 1-ОЯТДАН  НУҲ СУРAСИ 28-ОЯТГАЧА | "
                 "Қуръон билан танишув \n24-СУҲБАТ")
     await msg.answer_audio(

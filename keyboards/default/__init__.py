@@ -3,13 +3,12 @@ from . import quranmuqriy_dk
 from . import audio_video_dk
 from . import ramazon1443_dk
 from . import taroveh1443_dk
-from . import qurantanishuv_dk
 from . import mushafistilohlari_dk
 from . import qasam_dk
 from . import iqro_dk
 from . import qurantartil_dk
 from . import qversedk
-from . import qurantalimi_dk
+from . import quran_talimi
 from . import hamnafas_dk
 from . import tahoratvanamoz_dk
 from . import shamoil_dk

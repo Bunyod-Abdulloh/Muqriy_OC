@@ -1,14 +1,21 @@
 from aiogram import executor
 
-from loader import dp, db
+from loader import dp, sdb
 from utils.notify_admins import on_startup_notify
 from utils.set_bot_commands import set_default_commands
 from handlers.users.help import AlbumMiddleware
 
 
 async def on_startup(dispatcher):
-    await db.create()
-    await db.create_table_users()
+    # await db.create()
+    # await db.create_table_users()
+    await sdb.create()
+    await sdb.drop_table_bot_answer()
+    await sdb.create_table_man_sos()
+    await sdb.create_table_woman()
+    await sdb.create_table_bot_answer()
+    await sdb.create_table_admins()
+
     await set_default_commands(dispatcher)
     await on_startup_notify(dispatcher)
 

@@ -23,10 +23,9 @@ from . import hamsafar_hr
 from . import haj_hr
 from . import navoiyanglash_hr
 from . import zikrlar_hr
-from . import savol_men_hr
-from . import savol_women_hr
 from . import juma_suhbatlari_handler
 from . import muqriyverse
 from . import toshshahar_suhbatlar_handler
 from . import toplam_handlers
-from . import echo
+from . import taroveh_hands
+from . import quran_screens

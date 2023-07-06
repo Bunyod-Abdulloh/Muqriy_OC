@@ -1,10 +1,10 @@
 from aiogram.types import ReplyKeyboardMarkup
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-savol_dk = ReplyKeyboardMarkup(resize_keyboard=True)
-savol_dk.insert('Аёллар')
-savol_dk.insert('Эркаклар')
-savol_dk.add('🏡 Бош меню')
+savol_ck = ReplyKeyboardMarkup(resize_keyboard=True)
+savol_ck.insert('Аёллар')
+savol_ck.insert('Эркаклар')
+savol_ck.add('🏡 Бош меню')
 
 yes_no = InlineKeyboardMarkup(
     row_width=2,

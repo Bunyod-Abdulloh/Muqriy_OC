@@ -3,6 +3,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 istiloh_sharh_keys = ReplyKeyboardMarkup(
 	keyboard=[
 		[
+			KeyboardButton(text="⏮ Oлдинги"),
 			KeyboardButton(text="🏡 Бош меню"),
 		],
 		[

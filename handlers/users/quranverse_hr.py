@@ -13,6 +13,7 @@ async def quranverse(msg: types.Message):
 					 reply_markup=await suralar38gacha())
 	await Edit.a.set()
 
+
 @dp.message_handler(state=Edit.a)
 async def sura(message: types.Message, state: FSMContext):
 	# if message.text == "📖 Йўриқнома":

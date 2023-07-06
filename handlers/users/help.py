@@ -5,15 +5,6 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.handler import CancelHandler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
-from loader import dp, bot
-
-# @dp.message_handler(CommandHelp())
-# async def bot_help(message: types.Message):
-#     text = ("Буйруқлар: ",
-#             "/start - Ботни қайта ишга тушириш",
-#             "/help - Ёрдам",
-#
-#     await message.answer("\n".join(text))
 
 class AlbumMiddleware(BaseMiddleware):
     """This middleware is for capturing media groups."""
@@ -46,23 +37,3 @@ class AlbumMiddleware(BaseMiddleware):
         """Clean up after handling our album."""
         if message.media_group_id and message.conf.get("is_last"):
             del self.album_data[message.media_group_id]
-
-
-# @dp.message_handler(is_media_group=True, content_types=types.ContentType.PHOTO)
-# async def handle_albums(message: types.Message, album: List[types.Message]):
-#     """This handler will receive a complete album of any type."""
-#     media_group = types.MediaGroup()
-#     for obj in album:
-#         if obj.photo:
-#             file_id = obj.photo[-1].file_id
-#         else:
-#             file_id = obj[obj.content_type].file_id
-#
-#         try:
-#             # We can also add a caption to each file by specifying `"caption": "text"`
-#             media_group.attach({"media": file_id, "type": obj.content_type, "caption" : obj.caption})
-#         except ValueError:
-#             return await message.answer("This type of album is not supported by aiogram.")
-#
-#     await message.answer_media_group(media_group)
-#
